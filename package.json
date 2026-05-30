@@ -1,0 +1,31 @@
+{
+  "name": "3XUI_Telegram_bot",
+  "version": "1.0.0",
+  "description": "ربات مدیریت کاربران و پنل 3Xui",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "prisma:gen": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@prisma/adapter-mariadb": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.2.2",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mysql2": "^3.22.3",
+    "path": "^0.12.7",
+    "qrcode": "^1.5.4",
+    "telegraf": "^4.16.3",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "prisma": "^7.8.0"
+  }
+}

@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model servers{
+    id    Int    @id @default(autoincrement())
+    settings Json @unique
+    services service[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    clients client[]
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SELLER
+}
+
+enum ClientStatus{
+  PAIED
+  CREATED
+}
+
+enum OrderStatus{
+  PAIED
+  WAITING
+  VERIFIED
+}
+
+model user{
+  id BigInt @id @default(autoincrement())
+  username String? 
+  fullname String?
+  chat_id BigInt
+  role UserRole
+  balance BigInt @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user_states user_state[]
+}
+
+model user_state{
+  id Int @id @default(autoincrement())
+  step String
+  level Int
+  data Json
+  user user @relation(fields: [user_id], references: [id])
+  user_id BigInt
+}
+
+model service {
+  id BigInt @id @default(autoincrement())
+  title String
+  inboundIDS Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  plans ServicesOnPlans[]
+  server servers @relation(fields: [server_id], references: [id])
+  server_id Int
+  clients ServicesOnClients[]
+}
+
+
+model plan{
+  id BigInt @id @default(autoincrement())
+  traffic String
+  days String
+  price String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  clients client[]
+  services ServicesOnPlans[]
+}
+
+model ServicesOnPlans {
+  plans       plan     @relation(fields: [planId], references: [id])
+  planId     BigInt // relation scalar field (used in the `@relation` attribute above)
+  service   service @relation(fields: [serviceId], references: [id])
+  serviceId BigInt // relation scalar field (used in the `@relation` attribute above)
+  @@id([planId, serviceId])
+}
+
+model client{
+  id BigInt @id @default(autoincrement())
+  plan plan? @relation(fields: [plan_id], references: [id])
+  plan_id BigInt?
+  server servers @relation(fields: [server_id], references: [id])
+  server_id Int
+  traffic Int
+  days Int
+  email String
+  price Int
+  status ClientStatus
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  notebook notebook?
+  services ServicesOnClients[]
+}
+
+model ServicesOnClients {
+  services       service     @relation(fields: [serviceId], references: [id])
+  serviceId     BigInt // relation scalar field (used in the `@relation` attribute above)
+  clients   client @relation(fields: [clientId], references: [id])
+  clientId BigInt // relation scalar field (used in the `@relation` attribute above)
+  @@id([serviceId, clientId])
+}
+
+model notebook{
+  id BigInt @id @default(autoincrement())
+  message_id Int?
+  text Json
+  client client @relation(fields: [client_id], references: [id])
+  client_id BigInt @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
