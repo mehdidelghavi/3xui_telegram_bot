@@ -13,7 +13,7 @@ datasource db {
 
 model servers{
     id    Int    @id @default(autoincrement())
-    settings Json @unique
+    settings Json 
     services service[]
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
