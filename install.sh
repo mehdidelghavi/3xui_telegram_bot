@@ -62,7 +62,7 @@ echo "📦 Installing npm packages..."
 npm install
 
 # =========================
-# 7. MYSQL SETUP (IMPORTANT FIXED)
+# 7. MYSQL SETUP
 # =========================
 echo "🗄️ Setting up MySQL..."
 
@@ -87,7 +87,13 @@ EOF
 echo "✅ MySQL setup completed!"
 
 # =========================
-# 8. ENV SETUP (FIXED ORDER)
+# 8. MYSQL START
+# =========================
+sudo systemctl enable mysql
+sudo systemctl start mysql
+
+# =========================
+# 9. ENV SETUP (FIXED)
 # =========================
 echo "⚙️ Setting .env..."
 
@@ -95,10 +101,10 @@ cp .env.example .env
 
 DATABASE_URL="mysql://$DB_USER:$DB_PASS@localhost:3306/$DB_NAME"
 
-read -p "Notebook_Channel_Id: " Notebook_Channel_Id
+read -p "Notebook_Channel_Id: " Notebook_CHANNEL_ID
 read -p "BOT_TOKEN: " BOT_TOKEN
 
-sed -i "s|Notebook_Channel_Id=.*|Notebook_Channel_Id=$Notebook_Channel_Id|" .env
+sed -i "s|Notebook_Channel_Id=.*|Notebook_Channel_Id=$Notebook_CHANNEL_ID|" .env
 sed -i "s|BOT_TOKEN=.*|BOT_TOKEN=$BOT_TOKEN|" .env
 sed -i "s|DATABASE_URL=.*|DATABASE_URL=$DATABASE_URL|" .env
 sed -i "s|DATABASE_USER=.*|DATABASE_USER=$DB_USER|" .env
@@ -106,17 +112,11 @@ sed -i "s|DATABASE_PASSWORD=.*|DATABASE_PASSWORD=$DB_PASS|" .env
 sed -i "s|DATABASE_DBNAME=.*|DATABASE_DBNAME=$DB_NAME|" .env
 
 # =========================
-# 9. PRISMA SETUP (FIXED ORDER)
+# 10. PRISMA SETUP (FIXED ORDER)
 # =========================
 echo "🧬 Prisma setup..."
 npx prisma generate
 npx prisma migrate deploy
-
-# =========================
-# 10. START MYSQL
-# =========================
-sudo systemctl enable mysql
-sudo systemctl start mysql
 
 # =========================
 # 11. PM2 START
