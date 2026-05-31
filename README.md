@@ -20,6 +20,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/mehdidelghavi/3xui_telegram_bo
 |DB_PASS|رمز عبور دیتابیس|
 |Notebook_Channel_Id|آیدی عددی کانال برای ذخیره موارد مالی|
 |BOT_TOKEN|توکن ربات تلگرام|
+|ADMIN_CHAT_ID|ایدی عددی تلگرام برای ادمین|
 
 
 
