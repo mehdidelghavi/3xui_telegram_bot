@@ -61,6 +61,14 @@ pm2 logs xui-bot
 pm2 restart xui-bot
 ```
 
+
+## آینده پروژه
+
+- ربات فروشگاه برای کاربران
+- ربات همکاری در فروش
+- پنل مدیریت [ادمین - فروشگاه - همکاران]
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
