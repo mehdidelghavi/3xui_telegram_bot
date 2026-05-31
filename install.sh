@@ -71,6 +71,13 @@ read -p "DB USER: " DB_USER
 read -p "DB PASSWORD: " DB_PASS
 read -p "MySQL root password (press enter if none): " ROOT_PASS
 
+# sanitize DB name
+DB_NAME=$(echo "$DB_NAME" | tr -cd 'a-zA-Z0-9_')
+if [[ ! "$DB_NAME" =~ ^[a-zA-Z0-9_]+$ ]]; then
+  echo "❌ Invalid DB name"
+  exit 1
+fi
+
 MYSQL_CMD="mysql -u root"
 
 if [ ! -z "$ROOT_PASS" ]; then
@@ -106,7 +113,7 @@ read -p "BOT_TOKEN: " BOT_TOKEN
 
 sed -i "s|Notebook_Channel_Id=.*|Notebook_Channel_Id=$Notebook_CHANNEL_ID|" .env
 sed -i "s|BOT_TOKEN=.*|BOT_TOKEN=$BOT_TOKEN|" .env
-sed -i "s|DATABASE_URL=.*|DATABASE_URL=$DATABASE_URL|" .env
+sed -i "s|^DATABASE_URL=.*|DATABASE_URL=$DATABASE_URL|" .env
 sed -i "s|DATABASE_USER=.*|DATABASE_USER=$DB_USER|" .env
 sed -i "s|DATABASE_PASSWORD=.*|DATABASE_PASSWORD=$DB_PASS|" .env
 sed -i "s|DATABASE_DBNAME=.*|DATABASE_DBNAME=$DB_NAME|" .env
