@@ -92,3 +92,7 @@ exports.sendMessageWithQr = async (ctx, text, link) => {
 exports.priceFormatte = (price) => {
     return new Intl.NumberFormat('en-US').format(price);
 }
+
+exports.generateURLForXui = (domain, port, subPath) => {
+    return domain + `:${port}` + subPath;
+}

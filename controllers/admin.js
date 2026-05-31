@@ -143,7 +143,7 @@ exports.bot = (bot) => {
             let clientInfo = null;
             let serverInfo = null;
             for (const serverItems of getServers) {
-                let url = serverItems.settings.domain + `:${serverItems.settings.port}` + `/panel/api/clients/get/${email}`;
+                let url = serverItems.settings.domain + `:${serverItems.settings.port}/${serverItems.settings.subPath}` + `/panel/api/clients/get/${email}`;
                 const getClient = await xuiController.getClient({ url: url, token: serverItems.settings.token });
                 if (getClient.success) {
                     clientInfo = getClient.obj;
@@ -156,10 +156,7 @@ exports.bot = (bot) => {
             } else {
                 const trafficForXui = functionHelpers.GBtoByte(getUserState.data.traffic);
                 const expireTime = functionHelpers.dateToTimestamps(ctx.message.text);
-                let url = serverInfo.domain;
-                if (Number(serverInfo.port) != 443) {
-                    url = serverInfo.domain + `:${serverInfo.port}`
-                }
+                let url = serverInfo.domain + `:${serverInfo.port}/${serverItems.settings.subPath}`;
                 const data = {
                     url: url,
                     token: serverInfo.token,
@@ -202,7 +199,7 @@ exports.bot = (bot) => {
             let deletedClient = false;
 
             for (const serverItems of getServers) {
-                let url = serverItems.settings.domain + `:${serverItems.settings.port}` + `/panel/api/clients/del/${ctx.message.text}`;
+                let url = serverItems.settings.domain + `:${serverItems.settings.port}/${serverItems.settings.subPath}` + `/panel/api/clients/del/${ctx.message.text}`;
                 const data = {
                     url: url,
                     token: serverItems.settings.token,
@@ -319,7 +316,7 @@ exports.bot = (bot) => {
             let serverInfo = null;
 
             for (const serverItems of getServers) {
-                let url = serverItems.settings.domain + `:${serverItems.settings.port}` + `/panel/api/clients/traffic/${ctx.message.text}`;
+                let url = serverItems.settings.domain + `:${serverItems.settings.port}/${serverItems.settings.subPath}` + `/panel/api/clients/traffic/${ctx.message.text}`;
                 const getClient = await xuiController.getClient({ url: url, token: serverItems.settings.token });
                 if (getClient.success) {
                     clientInfo = getClient.obj;
@@ -464,7 +461,7 @@ exports.bot = (bot) => {
         const serviceID = ctx.match[1];
         const getService = await botController.getServiceById(serviceID);
         let serviceInbounds = getService.inboundIDS;
-        const getInbounds = await xuiController.getInbounds({ url: `${getService.server.settings.domain}:${getService.server.settings.port}`, token: getService.server.settings.token });
+        const getInbounds = await xuiController.getInbounds({ url: `${getService.server.settings.domain}:${getService.server.settings.port}/${serverItems.settings.subPath}`, token: getService.server.settings.token });
         let changed = false;
         const serverInbounds = [];
         for (const inboundItems of getInbounds.obj) {
@@ -522,7 +519,7 @@ exports.bot = (bot) => {
         const serviceID = ctx.match[1];
         const getService = await botController.getServiceById(serviceID);
         let serviceInbounds = getService.inboundIDS ?? [];
-        let getInbounds = await xuiController.getInbounds({ url: `${getService.server.settings.domain}:${getService.server.settings.port}`, token: getService.server.settings.token });
+        let getInbounds = await xuiController.getInbounds({ url: `${getService.server.settings.domain}:${getService.server.settings.port}/${serverItems.settings.subPath}`, token: getService.server.settings.token });
         getInbounds = getInbounds.obj;
         let inlineKeyboard = [];
         for (const getInboundItems of getInbounds) {
@@ -554,7 +551,7 @@ exports.bot = (bot) => {
             inboundIDS = inboundIDS.filter(id => id !== Number(inboundID));
         }
         const attach = await botController.attachInboundToService(serviceID, inboundIDS);
-        let getInbounds = await xuiController.getInbounds({ url: `${getService.server.settings.domain}:${getService.server.settings.port}`, token: getService.server.settings.token });
+        let getInbounds = await xuiController.getInbounds({ url: `${getService.server.settings.domain}:${getService.server.settings.port}/${serverItems.settings.subPath}`, token: getService.server.settings.token });
         getInbounds = getInbounds.obj;
         let inlineKeyboard = [];
         for (const getInboundItems of getInbounds) {
@@ -589,7 +586,7 @@ exports.bot = (bot) => {
             inboundIDS.push(Number(inboundID));
         }
         const attach = await botController.attachInboundToService(serviceID, inboundIDS);
-        let getInbounds = await xuiController.getInbounds({ url: `${getService.server.settings.domain}:${getService.server.settings.port}`, token: getService.server.settings.token });
+        let getInbounds = await xuiController.getInbounds({ url: `${getService.server.settings.domain}:${getService.server.settings.port}/${serverItems.settings.subPath}`, token: getService.server.settings.token });
         getInbounds = getInbounds.obj;
         let inlineKeyboard = [];
         for (const getInboundItems of getInbounds) {
@@ -630,10 +627,7 @@ exports.bot = (bot) => {
     bot.action(/^Client:Traffic:Reset:(.+)$/, async (ctx) => {
         const getUserState = await botController.getUserState(ctx.user.id);
         const email = ctx.match[1];
-        let url = getUserState.data.server.domain + `/panel/api/clients/resetTraffic/${email}`;
-        if (getUserState.data.server.port != 443) {
-            url = getUserState.data.server.domain + `:${getUserState.data.server.port}` + `/panel/api/clients/resetTraffic/${email}`;
-        }
+        let url = getUserState.data.server.domain + `:${getUserState.data.server.port}/${serverItems.settings.subPath}` + `/panel/api/clients/resetTraffic/${email}`;
         const data = {
             url: url,
             token: getUserState.data.server.token,
@@ -669,10 +663,7 @@ exports.bot = (bot) => {
             server: server
         };
         const updateUserState = await botController.updateUserState(ctx.user.id, "افزودن کلاینت", 4, userData);
-        let url = server.settings.domain;
-        if (Number(server.settings.port) != 443) {
-            url = server.settings.domain + `:${server.settings.port}`
-        }
+        let url = server.settings.domain + `:${server.settings.port}/${serverItems.settings.subPath}`;
         const getServices = await botController.getServicesByServerID(Number(serverId));
         const inlineKeyboard = [];
         getServices.forEach(serviceItem => {
@@ -730,10 +721,7 @@ exports.bot = (bot) => {
         const updateUserState = await botController.updateUserState(ctx.user.id, "افزودن کلاینت", 5, userData);
         const trafficForXui = functionHelpers.GBtoByte(getUserState.data.traffic);
         const expireTime = functionHelpers.dateToTimestamps(getUserState.data.days);
-        let url = getUserState.data.server.settings.domain;
-        if (Number(getUserState.data.server.settings.port) != 443) {
-            url = getUserState.data.server.settings.domain + `:${getUserState.data.server.settings.port}`
-        }
+        let url = getUserState.data.server.settings.domain + `:${getUserState.data.server.settings.port}/${serverItems.settings.subPath}`;
         const data = {
             url: url,
             token: getUserState.data.server.settings.token,
