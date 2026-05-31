@@ -1,7 +1,5 @@
 const prisma = require("./helpers/prisma");
 
-const prisma = new PrismaClient();
-
 async function main() {
     const chatId = process.argv[2];
 
