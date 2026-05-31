@@ -8,18 +8,23 @@ async function main() {
         process.exit(1);
     }
 
-    const user = await prisma.user.upsert({
-        where: {
-            chat_id: chatId,
-        },
-        update: {
-            role: 'ADMIN',
-        },
-        create: {
-            chat_id: chatId,
-            role: 'ADMIN',
-        },
+    const user = await prisma.user.findFirst({
+        where: { chat_id: chatId }
     });
+
+    if (user) {
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { role: "ADMIN" }
+        });
+    } else {
+        await prisma.user.create({
+            data: {
+                chat_id: chatId,
+                role: "ADMIN"
+            }
+        });
+    }
 
     console.log('✅ Admin user created/updated:', user);
 }
