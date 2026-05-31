@@ -60,3 +60,7 @@ pm2 logs xui-bot
 ```bash
 pm2 restart xui-bot
 ```
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
