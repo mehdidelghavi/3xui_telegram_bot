@@ -166,7 +166,15 @@ sudo apt install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d $DOMAIN --non-interactive --agree-tos -m $EMAIL
 
 # =========================
-# 14. DONE
+# 14. SETUP ADMIN 
+# =========================
+
+echo "Enter Admin Telegram Chat ID:"
+read ADMIN_CHAT_ID
+node setup-admin.js "$ADMIN_CHAT_ID"
+
+# =========================
+# 15. DONE
 # =========================
 echo "✅ INSTALLATION COMPLETE!"
 echo "🚀 Bot running with PM2"
