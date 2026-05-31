@@ -47,7 +47,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/mehdidelghavi/3xui_telegram_bo
 بررسی وضعیت ربات
 
 ```bash
-  pm2 status
+pm2 status
 ```
 
 نمایش لاگ ها
