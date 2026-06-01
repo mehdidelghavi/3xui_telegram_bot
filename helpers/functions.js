@@ -93,6 +93,10 @@ exports.priceFormatte = (price) => {
     return new Intl.NumberFormat('en-US').format(price);
 }
 
-exports.generateURLForXui = (domain, port, subPath) => {
-    return domain + `:${port}` + subPath;
+exports.generateURLForXui = (domain, port, path) => {
+    return `http://${domain}:${port}/${path}`;
+}
+
+exports.generateSubLinkForXui = (domain, port, subPath, subId) => {
+    return `http://${domain}:${port}/${subPath}/${subId}`;
 }

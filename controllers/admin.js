@@ -143,7 +143,7 @@ exports.bot = (bot) => {
             let clientInfo = null;
             let serverInfo = null;
             for (const serverItems of getServers) {
-                let url = serverItems.settings.domain + `:${serverItems.settings.port}/${serverItems.settings.subPath}` + `/panel/api/clients/get/${email}`;
+                let url = functionHelpers.generateURLForXui(serverItems.settings.domain, serverItems.settings.port, serverItems.settings.path) + `/panel/api/clients/get/${data.email}`;
                 const getClient = await xuiController.getClient({ url: url, token: serverItems.settings.token });
                 if (getClient.success) {
                     clientInfo = getClient.obj;
@@ -156,7 +156,7 @@ exports.bot = (bot) => {
             } else {
                 const trafficForXui = functionHelpers.GBtoByte(getUserState.data.traffic);
                 const expireTime = functionHelpers.dateToTimestamps(ctx.message.text);
-                let url = serverInfo.domain + `:${serverInfo.port}/${serverInfo.settings.subPath}`;
+                let url = functionHelpers.generateURLForXui(serverInfo.domain, serverInfo.port, serverInfo.path);
                 const data = {
                     url: url,
                     token: serverInfo.token,
@@ -169,10 +169,7 @@ exports.bot = (bot) => {
                     }
                 };
                 const updateClient = await xuiController.updateClient(data);
-                let subLink = serverInfo.domain + serverInfo.subPath + updateClient.subId;
-                if (serverInfo.subPort != 443) {
-                    subLink = serverInfo.domain + `:${serverInfo.subPort}` + serverInfo.subPath + updateClient.subId;
-                }
+                let subLink = functionHelpers.generateSubLinkForXui(serverInfo.domain, serverInfo.subPort, serverInfo.subPath, updateClient.subId);
                 let Text = "🔗لینک ساب : \n" + `<code> ${subLink}</code> ` + "\n\n";
                 Text += "کانفیگ های شما: " + "\n";
                 let trafficForUi = `${getUserState.data.traffic} گیگابایت`;
@@ -199,7 +196,7 @@ exports.bot = (bot) => {
             let deletedClient = false;
 
             for (const serverItems of getServers) {
-                let url = serverItems.settings.domain + `:${serverItems.settings.port}/${serverItems.settings.subPath}` + `/panel/api/clients/del/${ctx.message.text}`;
+                let url = functionHelpers.generateURLForXui(serverItems.settings.domain, serverItems.settings.port, serverItems.settings.path);
                 const data = {
                     url: url,
                     token: serverItems.settings.token,
@@ -316,7 +313,7 @@ exports.bot = (bot) => {
             let serverInfo = null;
 
             for (const serverItems of getServers) {
-                let url = serverItems.settings.domain + `:${serverItems.settings.port}/${serverItems.settings.subPath}` + `/panel/api/clients/traffic/${ctx.message.text}`;
+                let url = functionHelpers.generateURLForXui(serverItems.settings.domain, serverItems.settings.port, serverItems.settings.path) + `/panel/api/clients/traffic/${ctx.message.text}`;
                 const getClient = await xuiController.getClient({ url: url, token: serverItems.settings.token });
                 if (getClient.success) {
                     clientInfo = getClient.obj;
@@ -332,10 +329,7 @@ exports.bot = (bot) => {
                 const totalTraffic = functionHelpers.BytetoGB(clientInfo.total);
                 const remainingTraffic = functionHelpers.BytetoGB((clientInfo.total - clientInfo.down) - clientInfo.up);
                 const remainingDays = functionHelpers.timeStampToRemainingDays(clientInfo.expiryTime);
-                let subLink = serverInfo.domain + serverInfo.subPath + clientInfo.subId;
-                if (serverInfo.subPort != 443) {
-                    subLink = serverInfo.domain + `:${serverInfo.subPort}` + serverInfo.subPath + clientInfo.subId;
-                }
+                let subLink = functionHelpers.generateSubLinkForXui(serverInfo.domain, serverInfo.subPort, serverInfo.subPath, clientInfo.subId);
                 let Text = `اطلاعات کلاینت <code>${ctx.message.text}</code> به شرح زیر میباشد \n \n`;
                 Text += `آیدی : <code>${clientInfo.id}</code> \n\n`;
                 Text += `uuid : <code>${clientInfo.uuid}</code> \n\n`;
@@ -461,7 +455,8 @@ exports.bot = (bot) => {
         const serviceID = ctx.match[1];
         const getService = await botController.getServiceById(serviceID);
         let serviceInbounds = getService.inboundIDS;
-        const getInbounds = await xuiController.getInbounds({ url: `${getService.server.settings.domain}:${getService.server.settings.port}/${getService.server.settings.subPath}`, token: getService.server.settings.token });
+        let url = functionHelpers.generateURLForXui(getService.server.settings.domain, getService.server.settings.port, getService.server.settings.path);
+        const getInbounds = await xuiController.getInbounds({ url: url, token: getService.server.settings.token });
         let changed = false;
         const serverInbounds = [];
         for (const inboundItems of getInbounds.obj) {
@@ -519,7 +514,8 @@ exports.bot = (bot) => {
         const serviceID = ctx.match[1];
         const getService = await botController.getServiceById(serviceID);
         let serviceInbounds = getService.inboundIDS ?? [];
-        let getInbounds = await xuiController.getInbounds({ url: `${getService.server.settings.domain}:${getService.server.settings.port}/${getService.server.settings.subPath}`, token: getService.server.settings.token });
+        let url = functionHelpers.generateURLForXui(getService.server.settings.domain, getService.server.settings.port, getService.server.settings.path);
+        let getInbounds = await xuiController.getInbounds({ url: url, token: getService.server.settings.token });
         getInbounds = getInbounds.obj;
         let inlineKeyboard = [];
         for (const getInboundItems of getInbounds) {
@@ -551,7 +547,8 @@ exports.bot = (bot) => {
             inboundIDS = inboundIDS.filter(id => id !== Number(inboundID));
         }
         const attach = await botController.attachInboundToService(serviceID, inboundIDS);
-        let getInbounds = await xuiController.getInbounds({ url: `${getService.server.settings.domain}:${getService.server.settings.port}/${getService.server.settings.subPath}`, token: getService.server.settings.token });
+        let url = functionHelpers.generateURLForXui(getService.server.settings.domain, getService.server.settings.port, getService.server.settings.path);
+        let getInbounds = await xuiController.getInbounds({ url: url, token: getService.server.settings.token });
         getInbounds = getInbounds.obj;
         let inlineKeyboard = [];
         for (const getInboundItems of getInbounds) {
@@ -586,7 +583,8 @@ exports.bot = (bot) => {
             inboundIDS.push(Number(inboundID));
         }
         const attach = await botController.attachInboundToService(serviceID, inboundIDS);
-        let getInbounds = await xuiController.getInbounds({ url: `${getService.server.settings.domain}:${getService.server.settings.port}/${serverItems.settings.subPath}`, token: getService.server.settings.token });
+        let url = functionHelpers.generateURLForXui(getService.server.settings.domain, getService.server.settings.port, getService.server.settings.path);
+        let getInbounds = await xuiController.getInbounds({ url: url, token: getService.server.settings.token });
         getInbounds = getInbounds.obj;
         let inlineKeyboard = [];
         for (const getInboundItems of getInbounds) {
@@ -627,7 +625,7 @@ exports.bot = (bot) => {
     bot.action(/^Client:Traffic:Reset:(.+)$/, async (ctx) => {
         const getUserState = await botController.getUserState(ctx.user.id);
         const email = ctx.match[1];
-        let url = getUserState.data.server.domain + `:${getUserState.data.server.port}/${getUserState.data.server.subPath}` + `/panel/api/clients/resetTraffic/${email}`;
+        let url = functionHelpers.generateURLForXui(getUserState.data.server.domain, getUserState.data.server.port, getUserState.data.server.path) + `/panel/api/clients/resetTraffic/${email}`;
         const data = {
             url: url,
             token: getUserState.data.server.token,
@@ -663,7 +661,7 @@ exports.bot = (bot) => {
             server: server
         };
         const updateUserState = await botController.updateUserState(ctx.user.id, "افزودن کلاینت", 4, userData);
-        let url = server.settings.domain + `:${server.settings.port}/${server.settings.subPath}`;
+        let url = functionHelpers.generateURLForXui(server.settings.domain, server.settings.port, server.settings.path);
         const getServices = await botController.getServicesByServerID(Number(serverId));
         const inlineKeyboard = [];
         getServices.forEach(serviceItem => {
@@ -721,7 +719,7 @@ exports.bot = (bot) => {
         const updateUserState = await botController.updateUserState(ctx.user.id, "افزودن کلاینت", 5, userData);
         const trafficForXui = functionHelpers.GBtoByte(getUserState.data.traffic);
         const expireTime = functionHelpers.dateToTimestamps(getUserState.data.days);
-        let url = getUserState.data.server.settings.domain + `:${getUserState.data.server.settings.port}/${getUserState.data.server.settings.subPath}`;
+        let url = functionHelpers.generateURLForXui(getUserState.data.server.settings.domain, getUserState.data.server.settings.port, getUserState.data.server.settings.path);
         const data = {
             url: url,
             token: getUserState.data.server.settings.token,
@@ -738,10 +736,7 @@ exports.bot = (bot) => {
             }
         }
         const createClient = await xuiController.createClient(data);
-        let subLink = getUserState.data.server.settings.domain + getUserState.data.server.settings.subPath + createClient.subId;
-        if (getUserState.data.server.settings.subPort != 443) {
-            subLink = getUserState.data.server.settings.domain + `:${getUserState.data.server.settings.subPort} ` + getUserState.data.server.settings.subPath + createClient.subId;
-        }
+        let subLink = functionHelpers.generateSubLinkForXui(getUserState.data.server.settings.domain, getUserState.data.server.settings.subPort, getUserState.data.server.settings.subPath, createClient.subId);
         let Text = "🔗لینک ساب : \n" + `<code> ${subLink}</code>` + "\n\n";
         Text += "کانفیگ های شما: " + "\n";
         let trafficForUi = `${getUserState.data.traffic} گیگابایت`;
