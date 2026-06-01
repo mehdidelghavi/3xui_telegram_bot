@@ -29,7 +29,6 @@ exports.createServer = async (data) => {
  */
 exports.getInbounds = async (data) => {
     data.url = data.url + "/panel/api/inbounds/list";
-    console.log(data.url);
     const response = await fetchHelper.getXui(data);
     return response;
 }
