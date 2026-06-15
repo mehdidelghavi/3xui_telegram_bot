@@ -37,6 +37,12 @@ async function main() {
             }
         });
     }
+    const Paymentmethod = await prisma.paymentMethod.create({
+        data: {
+            name: "کارت به کارت",
+            type: "CARD_TO_CARD"
+        }
+    });
 
     console.log('✅ Admin User And Panel Setting Created');
 }
