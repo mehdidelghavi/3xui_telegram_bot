@@ -1,4 +1,5 @@
 const prisma = require('../helpers/prisma');
+const { getClient } = require('./xui');
 
 /**
  * دریافت کاربر بر اساس Chat ID تلگرام
@@ -8,12 +9,59 @@ const prisma = require('../helpers/prisma');
  * @returns {Promise<Object|null>} اطلاعات کاربر یا null
  */
 exports.returnUser = async (chatID) => {
-    const findUser = await prisma.user.findFirst({
+    try {
+        const findUser = await prisma.user.findFirst({
+            where: {
+                chat_id: chatID
+            }
+        });
+        return findUser;
+    } catch (e) {
+        console.log(e.message);
+    }
+}
+
+exports.createUser = async (data) => {
+    try {
+        const createUser = await prisma.user.create({
+            data: {
+                fullname: data.fullname,
+                chat_id: Number(data.chat_id),
+                username: data.username,
+                role: "USER",
+                balance: 0
+            }
+        });
+        return createUser;
+    } catch (e) {
+        console.log(e.message);
+    }
+}
+
+exports.getUserById = async (userId) => {
+    const user = await prisma.user.findUnique({
         where: {
-            chat_id: chatID
+            id: Number(userId)
         }
     });
-    return findUser;
+    return user;
+}
+
+exports.updateUserInfo = async (data) => {
+    try {
+        const updateUser = await prisma.user.updateMany({
+            data: {
+                fullname: data.fullname,
+                username: data.username
+            },
+            where: {
+                chat_id: Number(data.chat_id)
+            }
+        });
+        return updateUser;
+    } catch (e) {
+        console.log(e.message);
+    }
 }
 
 /**
@@ -129,6 +177,22 @@ exports.deleteUserState = async (user_id) => {
     }
 }
 
+exports.getServersCount = async () => {
+    const getServersCount = await prisma.servers.count();
+
+    return getServersCount;
+}
+
+exports.getClientsCount = async () => {
+    const getClientsCount = await prisma.client.count();
+    return getClientsCount;
+}
+
+exports.getServicesCount = async () => {
+    const getServicesCount = await prisma.service.count();
+    return getServicesCount;
+}
+
 /**
  * دریافت لیست تمام سرورهای ثبت شده
  *
@@ -226,6 +290,28 @@ exports.getServiceById = async (serviceID) => {
     return getService;
 }
 
+exports.getPlansByServiceId = async (serviceId) => {
+    const getPlans = await prisma.plan.findMany({
+        where: {
+            services: {
+                some: {
+                    serviceId: Number(serviceId)
+                }
+            }
+        }
+    });
+    return getPlans;
+}
+
+exports.getPlanById = async (planId) => {
+    const getPlan = await prisma.plan.findUnique({
+        where: {
+            id: Number(planId)
+        }
+    });
+    return getPlan;
+}
+
 /**
  * دریافت سرویس‌های متعلق به یک سرور
  *
@@ -236,7 +322,7 @@ exports.getServiceById = async (serviceID) => {
 exports.getServicesByServerID = async (serverID) => {
     const getServices = await prisma.service.findMany({
         where: {
-            server_id: serverID
+            server_id: Number(serverID)
         }
     });
     return getServices;
@@ -415,7 +501,7 @@ exports.createNotebook = async (data) => {
     const createNotebook = await prisma.notebook.create({
         data: {
             message_id: data.message_id,
-            client_id: data.client_id,
+            client_id: data.client_id || null,
             text: data.text
         }
     });
@@ -493,4 +579,313 @@ exports.updateNotebookMessageId = async (notebookID, messageID) => {
             id: notebookID
         }
     });
+}
+
+exports.getPaymentMethods = async () => {
+    const paymentMethods = await prisma.PaymentMethod.findMany();
+    return paymentMethods;
+}
+
+exports.getPaymentById = async (paymentId) => {
+    const getPayment = await prisma.payment.findFirst({
+        where: {
+            id: Number(paymentId)
+        },
+        include: {
+            method: true
+        }
+    });
+    return getPayment;
+}
+
+exports.getPaymentMethodById = async (methodId) => {
+    const paymentMethod = await prisma.paymentMethod.findFirst({
+        where: {
+            id: Number(methodId)
+        }
+    });
+    return paymentMethod;
+}
+
+exports.getPaymentMethodDetail = async (methodId) => {
+    const paymentMethodDetail = await prisma.paymentMethodDetail.findFirst({
+        where: {
+            payment_method_id: Number(methodId)
+        }
+    });
+    return paymentMethodDetail;
+}
+
+exports.createPayment = async (data) => {
+    const createPayment = await prisma.payment.create({
+        data: {
+            user_id: Number(data.user_id),
+            method_id: Number(data.method_id),
+            amount: Number(data.amount),
+            status: 'PENDING',
+            trackingCode: data.trackingCode
+        }
+    });
+    return createPayment;
+}
+
+exports.updatePaymentStatus = async (paymentId, status) => {
+    const updateStatus = await prisma.payment.update({
+        where: {
+            id: Number(paymentId)
+        },
+        data: {
+            status: status
+        }
+    });
+    return updateStatus;
+}
+
+exports.createCardToCardReceipt = async (data) => {
+    const createReceipt = await prisma.CardToCardReceipt.create({
+        data: {
+            payment_id: Number(data.payment_id),
+            receiptImage: data.receiptImage,
+            user_id: Number(data.user_id),
+            status: "PENDING"
+        }
+    });
+    return createReceipt;
+}
+
+exports.getReceiptById = async (receiptId) => {
+    const getReceipt = await prisma.CardToCardReceipt.findFirst({
+        where: {
+            id: Number(receiptId)
+        },
+        include: {
+            payment: true
+        }
+    });
+    return getReceipt;
+}
+
+exports.walletTransactionApprove = async (receiptId) => {
+    const result = await prisma.$transaction(async (tx) => {
+        const receipt = await tx.CardToCardReceipt.findUnique({
+            where: {
+                id: Number(receiptId)
+            },
+            include: {
+                payment: true
+            }
+        });
+        if (!receipt) {
+            throw new Error("Receipt not found");
+        }
+        if (receipt.status === "APPROVED") {
+            throw new Error("Receipt already approved");
+        }
+        const CardToCardReceiptUpdate = await tx.CardToCardReceipt.update({
+            data: {
+                status: "APPROVED"
+            },
+            where: {
+                id: Number(receiptId)
+            },
+            include: {
+                payment: true
+            }
+        });
+        const wallet_transaction = await tx.wallet_transaction.create({
+            data: {
+                user_id: receipt.user_id,
+                amount: receipt.payment.amount,
+                type: "DEPOSIT",
+                description: "شارژ ولت"
+            }
+        });
+        const userUpdate = await tx.user.update({
+            data: {
+                balance: {
+                    increment: receipt.payment.amount
+                }
+            },
+            where: {
+                id: Number(receipt.user_id)
+            }
+        });
+        const paymentUpdate = await tx.payment.update({
+            where: {
+                id: Number(receipt.payment_id)
+            },
+            data: {
+                status: 'SUCCESS'
+            }
+        });
+        return {
+            receipt: CardToCardReceiptUpdate,
+            user: userUpdate
+        }
+    });
+    return result;
+}
+
+exports.walletTransactionReject = async (receiptId) => {
+    const rejectReceipt = await prisma.CardToCardReceipt.update({
+        data: {
+            status: "REJECTED"
+        },
+        where: {
+            id: Number(receiptId)
+        },
+        include: {
+            payment: true
+        }
+    });
+    const paymentUpdate = await prisma.payment.update({
+        where: {
+            id: rejectReceipt.payment_id
+        },
+        data: {
+            status: "FAILED"
+        }
+    });
+    return rejectReceipt;
+}
+
+exports.usersConfigTransaction = async (data) => {
+    try {
+        const result = await prisma.$transaction(async (tx) => {
+            const wallet_transaction = await tx.wallet_transaction.create({
+                data: {
+                    user_id: Number(data.user_id),
+                    amount: Number(data.price),
+                    type: "PURCHASE",
+                    description: data.status || 'خرید کانفیگ'
+                }
+            });
+            const updateUserBalance = await tx.user.update({
+                where: {
+                    id: Number(data.user_id)
+                },
+                data: {
+                    balance: {
+                        decrement: data.price
+                    }
+                },
+            });
+
+            if (data.type == "PURCHASE") {
+                const createClient = await tx.client.create({
+                    data: {
+                        plan_id: data.plan_id,
+                        server_id: data.server_id,
+                        user_id: data.user_id,
+                        traffic: Number(data.traffic),
+                        days: Number(data.days),
+                        email: data.email,
+                        price: Number(data.price),
+                        status: "CREATED"
+                    }
+                });
+
+                const createOrder = await tx.order.create({
+                    data: {
+                        user_id: Number(data.user_id),
+                        service_id: Number(data.service_id),
+                        plan_id: Number(data.plan_id),
+                        client_id: Number(createClient.id),
+                        price: Number(data.price),
+                        note: "خرید کانفیگ جدید",
+                        status: "PURCHASE",
+                        email: data.email
+                    }
+                });
+            } else {
+                const updateClient = await tx.client.update({
+                    data: {
+                        plan_id: data.plan_id,
+                        server_id: data.server_id,
+                        user_id: data.user_id,
+                        traffic: Number(data.traffic),
+                        days: Number(data.days),
+                        price: Number(data.price),
+                    },
+                    where: {
+                        email: data.email
+                    }
+                });
+
+                const createOrder = await tx.order.create({
+                    data: {
+                        user_id: Number(data.user_id),
+                        service_id: Number(data.service_id),
+                        plan_id: Number(data.plan_id),
+                        client_id: Number(updateClient.id),
+                        price: Number(data.price),
+                        note: "تمدید کانفیگ",
+                        status: "RENEW",
+                        email: data.email
+                    }
+                });
+            }
+
+        });
+        return {
+            success: true,
+            message: "عملیات خرید یا تمدید کانفیگ کاربر با موفقیت انجام شد"
+        }
+    } catch (e) {
+        return {
+            success: false,
+            message: e.message
+        }
+    }
+}
+
+exports.getUserCompeletedOrders = async (userId) => {
+    const orders = await prisma.order.findMany({
+        where: {
+            user_id: Number(userId)
+        },
+        orderBy: {
+            createdAt: "desc"
+        },
+        include: {
+            plan: true,
+            service: true
+        }
+    });
+    return orders;
+}
+
+exports.getOrderById = async (orderId) => {
+    const getOrder = await prisma.order.findFirst({
+        where: {
+            id: Number(orderId)
+        }
+    });
+    return getOrder;
+}
+
+exports.getUserClients = async (userId) => {
+    const getClients = await prisma.client.findMany({
+        where: {
+            user_id: Number(userId)
+        },
+        include: {
+            plan: true,
+            server: true,
+        }
+    });
+    return getClients;
+}
+
+exports.getClientById = async (clientId) => {
+    const getClientById = await prisma.client.findUnique({
+        where: {
+            id: Number(clientId)
+        },
+        include: {
+            plan: true,
+            server: true,
+        }
+    });
+    return getClientById;
 }

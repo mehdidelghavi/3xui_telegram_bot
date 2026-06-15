@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+
+    <link rel="stylesheet" href="/css/app.css">
+    <%- block('styles') %>
+    <style>
+        table th, table td{
+            text-align: center !important;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-950 text-white">
+
+    <div class="flex h-screen">
+
+        <%- include('../partials/sidebar') %>
+
+        <div class="flex-1">
+
+            <%- include('../partials/header') %>
+
+            <main class="p-6">
+                <%- body %>
+            </main>
+
+        </div>
+
+    </div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<%- block('scripts') %>
+</body>
+
+</html>

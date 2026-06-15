@@ -9,18 +9,41 @@ const { botErrorHandler } = require("../helpers/errorHandler");
 const notebookChannel = process.env.Notebook_Channel_Id;
 
 exports.bot = (bot) => {
+    bot.on('edited_channel_post', async (ctx) => {
+
+        const post = ctx.update.edited_channel_post;
+
+        const chatId = post.chat.id;
+        const messageId = post.message_id;
+    });
     bot.use(async (ctx, next) => {
-        const getUser = await botController.returnUser(ctx.from.id);
-        if (getUser != null) {
-            if (getUser.role == "ADMIN") {
-                ctx.user = getUser;
-                return next();
-            } else {
-                return ctx.reply("شما مجاز به استفاده از این ربات نیستید");
-            }
-        } else {
-            return ctx.reply("شما مجاز به استفاده از این ربات نیستید");
+        if (ctx.update.channel_post) {
+            return;
         }
+        const getUser = await botController.returnUser(ctx.from.id);
+
+        const data = {
+            fullname: `${ctx.from.first_name || ''} ${ctx.from.last_name || ''}`,
+            chat_id: ctx.from.id,
+            username: ctx.from.username || null
+        };
+
+        if (getUser) {
+            ctx.user = getUser;
+
+            const oneHour = 60 * 60 * 1000;
+            const lastUpdate = new Date(getUser.updatedAt || getUser.createdAt).getTime();
+
+            if (Date.now() - lastUpdate >= oneHour) {
+                await botController.updateUserInfo(data);
+            }
+
+        } else {
+            const createUser = await botController.createUser(data);
+            ctx.user = createUser;
+        }
+
+        return next();
     });
 
     bot.catch(async (err, ctx) => {

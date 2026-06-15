@@ -110,8 +110,10 @@ DATABASE_URL="mysql://$DB_USER:$DB_PASS@localhost:3306/$DB_NAME"
 
 read -p "Notebook_Channel_Id: " Notebook_CHANNEL_ID
 read -p "BOT_TOKEN: " BOT_TOKEN
+read -p "SELLBOT_TOKEN: " SELLBOT_TOKEN
 
 sed -i "s|Notebook_Channel_Id=.*|Notebook_Channel_Id=$Notebook_CHANNEL_ID|" .env
+sed -i "s|SELLBOT_TOKEN=.*|SELLBOT_TOKEN=$SELLBOT_TOKEN|" .env
 sed -i "s|BOT_TOKEN=.*|BOT_TOKEN=$BOT_TOKEN|" .env
 sed -i "s|^DATABASE_URL=.*|DATABASE_URL=$DATABASE_URL|" .env
 sed -i "s|DATABASE_USER=.*|DATABASE_USER=$DB_USER|" .env
@@ -178,7 +180,14 @@ sudo certbot --nginx -d $DOMAIN --non-interactive --agree-tos -m $EMAIL
 
 echo "Enter Admin Telegram Chat ID:"
 read ADMIN_CHAT_ID
-node setup-admin.js "$ADMIN_CHAT_ID"
+
+echo "Enter Admin Username For Panel:"
+read ADMIN_USERNAME
+
+echo "Enter Admin Password For Panel:"
+read ADMIN_PASSWORD
+
+node setup-admin.js "$ADMIN_CHAT_ID" "$ADMIN_USERNAME" "$ADMIN_PASSWORD"
 
 # =========================
 # 15. DONE

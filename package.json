@@ -10,15 +10,25 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "prisma:gen": "prisma generate",
-    "prisma:migrate": "prisma migrate deploy"
+    "prisma:migrate": "prisma migrate deploy",
+    "css": "tailwindcss -i ./public/src/input.css -o ./public/css/app.css --watch"
   },
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "@quixo3/prisma-session-store": "^3.1.21",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.2",
+    "connect-flash": "^0.1.1",
     "dotenv": "^17.4.2",
+    "ejs": "^6.0.1",
+    "ejs-mate": "^4.0.0",
     "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "express-validator": "^7.3.2",
+    "jalaali-js": "^1.2.8",
+    "jalali-moment": "^3.3.11",
     "mysql2": "^3.22.3",
     "path": "^0.12.7",
     "qrcode": "^1.5.4",
@@ -26,6 +36,10 @@
     "winston": "^3.19.0"
   },
   "devDependencies": {
-    "prisma": "^7.8.0"
+    "@tailwindcss/cli": "^4.3.0",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.15",
+    "prisma": "^7.8.0",
+    "tailwindcss": "^4.3.0"
   }
 }

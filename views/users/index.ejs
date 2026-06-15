@@ -1,0 +1,40 @@
+<% layout('layouts/main') -%>
+
+<% block('styles').append('<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">') %>
+
+<div class="space-y-6">
+    <div class="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 p-4">
+
+        <table id="usersTable" class="display w-full">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>نام</th>
+                    <th>یوزرنیم</th>
+                    <th>آیدی عددی</th>
+                    <th>نقش</th>
+                    <th>تاریخ ایجاد</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+        </table>
+
+    </div>
+</div>
+
+<% block('scripts').append(`<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function () {
+
+    $('#usersTable').DataTable({
+        processing: true,
+        serverSide: true,
+        order: [[0, 'desc']],
+        ajax: {
+            url: '/users/api',
+            type: 'GET'
+        }
+    });
+
+});
+</script>`) %>

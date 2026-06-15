@@ -1,0 +1,152 @@
+<% layout('layouts/main') -%>
+
+<% block('styles').append('') %>
+
+<div class="max-w-2xl mx-auto bg-slate-900 p-6 rounded-xl border border-slate-800">
+
+    <h2 class="text-xl font-bold mb-6">ویرایش سرور</h2>
+    <% if (success && success.length > 0) { %>
+        <div class="bg-green-600 text-white px-4 py-2 rounded mb-4">
+            <%= success[0] %>
+        </div>
+    <% } %>
+    
+    <% if (failed && failed.length > 0) { %>
+        <div class="bg-red-600 text-white px-4 py-2 rounded mb-4">
+            <%= failed[0] %>
+        </div>
+    <% } %>
+    <form action="/servers/edit/<%= serverItem.id %>" method="POST" class="space-y-5">
+
+        <!-- Name -->
+        <div>
+            <label class="block mb-1 text-sm text-gray-300">نام سرور</label>
+            <input type="text" name="name"
+                   class="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-green-500 text-white" value="<%= old?.name || serverItem?.settings.name %>">
+        </div>
+        <% if (errors?.name) { %>
+            <p class="text-red-400 text-sm mt-1">
+                <%= errors.name.msg %>
+            </p>
+        <% } %>
+
+        <!-- Domain -->
+        <div>
+            <label class="block mb-1 text-sm text-gray-300">دامنه</label>
+            <input type="text" name="domain"
+                   class="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-green-500 text-white" value="<%= old?.domain || serverItem?.settings.domain %>">
+        </div>
+        <% if (errors?.domain) { %>
+            <p class="text-red-400 text-sm mt-1">
+                <%= errors.domain.msg %>
+            </p>
+        <% } %>
+
+        <!-- Port -->
+        <div>
+            <label class="block mb-1 text-sm text-gray-300">پورت</label>
+            <input type="number" name="port"
+                   class="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-green-500 text-white" value="<%= old?.port || serverItem?.settings.port %>">
+        </div>
+
+        <% if (errors?.port) { %>
+            <p class="text-red-400 text-sm mt-1">
+                <%= errors.port.msg %>
+            </p>
+        <% } %>
+
+        <!-- Path -->
+        <div>
+            <label class="block mb-1 text-sm text-gray-300">مسیر پنل</label>
+            <input type="text" name="path"
+                   class="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-green-500 text-white" value="<%= old?.path || serverItem?.settings.path %>">
+        </div>
+        <% if (errors?.path) { %>
+            <p class="text-red-400 text-sm mt-1">
+                <%= errors.path.msg %>
+            </p>
+        <% } %>
+
+        <!-- Token -->
+        <div>
+            <label class="block mb-1 text-sm text-gray-300">توکن</label>
+            <input type="text" name="token"
+                   class="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-green-500 text-white" value="<%= old?.token || serverItem?.settings.token %>">
+        </div>
+        <% if (errors?.token) { %>
+            <p class="text-red-400 text-sm mt-1">
+                <%= errors.token.msg %>
+            </p>
+        <% } %>
+
+        <!-- subPort -->
+        <div>
+            <label class="block mb-1 text-sm text-gray-300">پورت ساب</label>
+            <input type="number" name="subPort"
+                   class="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-green-500 text-white" value="<%= old?.subPort || serverItem?.settings.subPort %>">
+        </div>
+        <% if (errors?.subPort) { %>
+            <p class="text-red-400 text-sm mt-1">
+                <%= errors.subPort.msg %>
+            </p>
+        <% } %>
+
+        <!-- subPath -->
+        <div>
+            <label class="block mb-1 text-sm text-gray-300">مسیر ساب</label>
+            <input type="text" name="subPath"
+                   class="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-green-500 text-white" value="<%= old?.subPath || serverItem?.settings.subPath %>">
+        </div>
+        <% if (errors?.subPath) { %>
+            <p class="text-red-400 text-sm mt-1">
+                <%= errors.subPath.msg %>
+            </p>
+        <% } %>
+
+        <div class="mt-6">
+
+            <h3 class="text-lg font-semibold mb-3 text-white">
+                سرویس‌های این سرور
+            </h3>
+        
+            <% if (serverItem.services && serverItem.services.length > 0) { %>
+        
+                <div class="flex flex-wrap gap-2">
+        
+                    <% serverItem.services.forEach(service => { %>
+                        <span class="px-3 py-1 text-sm rounded-full bg-slate-800 border border-slate-700 text-gray-200">
+                            <%= service.title %>
+                        </span>
+                    <% }) %>
+        
+                </div>
+        
+            <% } else { %>
+        
+                <div class="text-gray-400 text-sm bg-slate-800 p-3 rounded-lg border border-slate-700">
+                    هیچ سرویسی برای این سرور تعریف نشده است
+                </div>
+        
+            <% } %>
+        
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end gap-3 pt-4">
+
+            <a href="/servers"
+               class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg">
+                لغو
+            </a>
+
+            <button type="submit"
+                    class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">
+                ذخیره
+            </button>
+
+        </div>
+
+    </form>
+</div>
+
+<% block('scripts').append(``) %>

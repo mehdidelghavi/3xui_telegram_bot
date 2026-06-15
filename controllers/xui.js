@@ -175,3 +175,8 @@ exports.attachInbounds = async (data) => {
     const attachInbounds = await fetchHelper.postXui(data);
     return attachInbounds;
 }
+
+exports.getLinks = async (data) => {
+    const clientLinks = await fetchHelper.getXui(data);
+    return clientLinks;
+}

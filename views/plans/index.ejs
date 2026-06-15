@@ -1,0 +1,68 @@
+<% layout('layouts/main') -%>
+
+<% block('styles').append('<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">') %>
+
+<div class="space-y-6">
+    <div class="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 p-4 mx-auto">
+        <div class="flex justify-center mb-3">
+            <a href="/plans/create"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-sm font-semibold rounded-xl transition duration-200 shadow-lg">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor">
+
+                <path stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4v16m8-8H4" />
+            </svg>
+
+            افزودن تعرفه جدید
+            </a>
+        </div>
+        <% if (success && success.length > 0) { %>
+            <div class="bg-green-600 text-white px-4 py-2 rounded mb-4">
+                <%= success[0] %>
+            </div>
+        <% } %>
+        
+        <% if (failed && failed.length > 0) { %>
+            <div class="bg-red-600 text-white px-4 py-2 rounded mb-4">
+                <%= failed[0] %>
+            </div>
+        <% } %>
+        <table id="usersTable" class="display w-full">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>ترافیک</th>
+                    <th>مدت زمان</th>
+                    <th>قیمت</th>
+                    <th>سرویس</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+        </table>
+
+    </div>
+</div>
+
+<% block('scripts').append(`<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function () {
+
+    $('#usersTable').DataTable({
+        processing: true,
+        serverSide: true,
+        order: [[0, 'desc']],
+        ajax: {
+            url: '/plans/api',
+            type: 'GET'
+        }
+    });
+
+});
+</script>`) %>

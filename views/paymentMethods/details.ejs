@@ -1,0 +1,142 @@
+<% layout('layouts/main') -%>
+
+
+<div class="max-w-2xl mx-auto bg-slate-900 p-6 rounded-xl border border-slate-800">
+
+    <h2 class="text-xl font-bold mb-6">افزودن کارت</h2>
+    <% if (success && success.length > 0) { %>
+        <div class="bg-green-600 text-white px-4 py-2 rounded mb-4">
+            <%= success[0] %>
+        </div>
+    <% } %>
+    
+    <% if (failed && failed.length > 0) { %>
+        <div class="bg-red-600 text-white px-4 py-2 rounded mb-4">
+            <%= failed[0] %>
+        </div>
+    <% } %>
+    <form action="/paymentMethods/detail/create/<%= paymentMethod.id %>" method="POST" class="space-y-5">
+        <!-- cardHolder -->
+        <div>
+            <label class="block mb-1 text-sm text-gray-300">صاحب کارت</label>
+            <input type="text" name="cardHolder" placeholder="نام و نام خانوادگی"
+                   class="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-green-500 text-white" value="<%= old?.cardHolder || '' %>">
+        </div>
+        <% if (errors?.cardHolder) { %>
+            <p class="text-red-400 text-sm mt-1">
+                <%= errors.cardHolder.msg %>
+            </p>
+        <% } %>
+
+        <!-- CardNumber -->
+        <div>
+            <label class="block mb-1 text-sm text-gray-300">شماره کارت</label>
+            <input type="text" name="cardNumber" placeholder="6037xxxxxxxxxxx"
+                   class="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-green-500 text-white" value="<%= old?.cardNumber || '' %>">
+        </div>
+        <% if (errors?.cardNumber) { %>
+            <p class="text-red-400 text-sm mt-1">
+                <%= errors.cardNumber.msg %>
+            </p>
+        <% } %>
+
+        <!-- BankName -->
+        <div>
+            <label class="block mb-1 text-sm text-gray-300">بانک</label>
+            <input type="text" name="bankName" placeholder="بانک ملی"
+                   class="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-green-500 text-white" value="<%= old?.bankName || '' %>">
+        </div>
+        <% if (errors?.bankName) { %>
+            <p class="text-red-400 text-sm mt-1">
+                <%= errors.bankName.msg %>
+            </p>
+        <% } %>
+
+        <div class="flex items-center justify-between p-4 bg-slate-800 border border-slate-700 rounded-lg">
+
+            <div>
+                <h3 class="text-sm font-medium text-white">وضعیت</h3>
+                <p class="text-xs text-gray-400">فعال یا غیرفعال بودن روش پرداخت</p>
+            </div>
+        
+            <label class="relative inline-flex items-center cursor-pointer">
+        
+                <input type="checkbox" name="isActive" value="1" class="sr-only peer" checked>
+        
+                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer
+                            peer-checked:bg-green-500 transition-all duration-300"></div>
+        
+                <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-all duration-300
+                            peer-checked:translate-x-5"></div>
+        
+            </label>
+        
+        </div>
+        <!-- Buttons -->
+        <div class="flex justify-end gap-3 pt-4">
+
+            <a href="/paymentMethods/"
+               class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg">
+                لغو
+            </a>
+
+            <button type="submit"
+                    class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">
+                ذخیره
+            </button>
+
+        </div>
+
+    </form>
+</div>
+
+<div class="max-w-2xl mx-auto bg-slate-900 p-6 rounded-xl border border-slate-800 mt-6">
+
+    <h2 class="text-xl font-bold mb-6">لیست کارت‌ها</h2>
+
+    <% if (!details || details.length === 0) { %>
+        <div class="text-gray-400 text-sm">
+            هیچ کارتی ثبت نشده است
+        </div>
+    <% } %>
+
+    <div class="space-y-3">
+
+        <% details.forEach(item => { %>
+
+            <div class="flex items-center justify-between p-4 rounded-lg bg-slate-800 border border-slate-700">
+
+                <!-- Left info -->
+                <div class="space-y-1">
+                    <div class="text-white text-sm font-medium">
+                        💳 <%= item.cardNumber || '-' %>
+                    </div>
+
+                    <div class="text-gray-400 text-xs">
+                        👤 <%= item.cardHolder || '-' %>
+                        <span class="mx-1">|</span>
+                        🏦 <%= item.bankName || '-' %>
+                    </div>
+                </div>
+
+                <!-- Right actions -->
+                <div class="flex gap-2">
+
+
+                    <!-- Delete -->
+                    <a href="/paymentMethods/details/<%= paymentMethod.id %>/delete/<%= item.id %>">
+                        <button type="submit"
+                            class="px-3 py-1 text-xs rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20">
+                            حذف
+                        </button>
+                    </a>
+
+                </div>
+
+            </div>
+
+        <% }) %>
+
+    </div>
+</div>
+

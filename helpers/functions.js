@@ -43,7 +43,7 @@ exports.timeStampToRemainingDays = (input) => {
     return remainingDays;
 }
 
-exports.sendMessageWithQr = async (ctx, text, link) => {
+exports.sendMessageWithQr = async (ctx, text, link, inlineKeyboard = null) => {
     // ساخت پوشه temp
     const tempDir = path.join(__dirname, 'temp');
 
@@ -63,16 +63,33 @@ exports.sendMessageWithQr = async (ctx, text, link) => {
             margin: 2,
             errorCorrectionLevel: 'H'
         });
+        const message = "";
 
         // ارسال
-        const message = await ctx.editMessageMedia(
-            {
-                type: "photo",
-                media: { source: filePath },
-                caption: text,
-                parse_mode: 'HTML'
-            },
-        );
+        if (inlineKeyboard == null) {
+            const message = await ctx.editMessageMedia(
+                {
+                    type: "photo",
+                    media: { source: filePath },
+                    caption: text,
+                    parse_mode: 'HTML'
+                },
+            );
+        } else {
+            const message = await ctx.editMessageMedia(
+                {
+                    type: "photo",
+                    media: { source: filePath },
+                    caption: text,
+                    parse_mode: 'HTML'
+                },
+                {
+                    reply_markup: {
+                        inline_keyboard: inlineKeyboard
+                    }
+                }
+            );
+        }
         return message;
 
     } catch (error) {
@@ -94,9 +111,15 @@ exports.priceFormatte = (price) => {
 }
 
 exports.generateURLForXui = (domain, port, path) => {
-    return `https://${domain}:${port}/${path}`;
+    return `http://${domain}:${port}/${path}`;
 }
 
 exports.generateSubLinkForXui = (domain, port, subPath, subId) => {
-    return `https://${domain}:${port}/${subPath}/${subId}`;
+    return `http://${domain}:${port}/${subPath}/${subId}`;
+}
+
+exports.generateTrackingCode = () => {
+    return crypto.randomBytes(5)
+        .toString('hex')
+        .toUpperCase();
 }

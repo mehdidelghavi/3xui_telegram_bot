@@ -31,12 +31,6 @@ enum ClientStatus{
   CREATED
 }
 
-enum OrderStatus{
-  PAIED
-  WAITING
-  VERIFIED
-}
-
 model user{
   id BigInt @id @default(autoincrement())
   username String? 
@@ -45,8 +39,13 @@ model user{
   role UserRole
   balance BigInt @default(0)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime? @updatedAt
   user_states user_state[]
+  orders order[]
+  cardtocardreciepts CardToCardReceipt[]
+  payments payment[]
+  wallet_transactions wallet_transaction[]
+  clients client[]
 }
 
 model user_state{
@@ -68,6 +67,7 @@ model service {
   server servers @relation(fields: [server_id], references: [id])
   server_id Int
   clients ServicesOnClients[]
+  orders order[]
 }
 
 
@@ -80,6 +80,7 @@ model plan{
   updatedAt DateTime @updatedAt
   clients client[]
   services ServicesOnPlans[]
+  orders order[]
 }
 
 model ServicesOnPlans {
@@ -92,19 +93,22 @@ model ServicesOnPlans {
 
 model client{
   id BigInt @id @default(autoincrement())
+  user_id BigInt
   plan plan? @relation(fields: [plan_id], references: [id])
   plan_id BigInt?
   server servers @relation(fields: [server_id], references: [id])
   server_id Int
   traffic Int
   days Int
-  email String
+  email String @unique
   price Int
   status ClientStatus
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   notebook notebook?
   services ServicesOnClients[]
+  orders order[]
+  user user @relation(fields: [user_id], references: [id])
 }
 
 model ServicesOnClients {
@@ -119,10 +123,165 @@ model notebook{
   id BigInt @id @default(autoincrement())
   message_id Int?
   text Json
-  client client @relation(fields: [client_id], references: [id])
-  client_id BigInt @unique
+  client client? @relation(fields: [client_id], references: [id])
+  client_id BigInt? @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 
+model panel_settings {
+  id BigInt @id @default(autoincrement())
+  username String
+  password String
+  extra_options Json?
+}
+
+enum OrderStatus{
+  PURCHASE
+  RENEW
+}
+
+
+model order{
+  id BigInt @id @default(autoincrement())
+  user_id BigInt
+  service_id BigInt
+  plan_id BigInt
+  client_id BigInt
+  price Int
+  status OrderStatus @default(PURCHASE)
+  note String?
+  email String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  client client @relation(fields: [client_id], references: [id])
+  user user @relation(fields: [user_id], references: [id])
+  service service @relation(fields: [service_id], references: [id])
+  plan plan @relation(fields: [plan_id], references: [id])
+}
+
+enum PaymentMethodType{
+  CARD_TO_CARD
+  CRYPTO
+  MANUAL
+}
+
+model PaymentMethod{
+  id BigInt @id @default(autoincrement())
+  name String
+  type PaymentMethodType
+  isActive Boolean @default(true)
+  details PaymentMethodDetail[]
+  payments payment[]
+}
+
+model PaymentMethodDetail{
+  id BigInt @id @default(autoincrement())
+  payment_method_id BigInt
+  // CARD
+  cardNumber String?
+  cardHolder String?
+  bankName String?
+  // Crypto
+  walletAddress String?
+  network String?
+  isActive Boolean @default(true)
+  paymentMethod PaymentMethod @relation(fields: [payment_method_id], references: [id])
+  @@index([payment_method_id])
+}
+
+enum PaymentStatus {
+  PENDING
+  WAITING_CONFIRMATION
+  SUCCESS
+  FAILED
+  EXPIRED
+}
+
+model payment{
+  id BigInt @id @default(autoincrement())
+  user_id BigInt
+  method_id BigInt
+  amount Int
+  status PaymentStatus @default(PENDING)
+  trackingCode String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user user @relation(fields: [user_id], references: [id])
+  method PaymentMethod @relation(fields: [method_id], references: [id])
+  cardReceipt CardToCardReceipt?
+  crypto CryptoPayment?
+}
+
+enum ReceiptStatus{
+  PENDING
+  APPROVED 
+  REJECTED
+}
+
+model CardToCardReceipt{
+  id BigInt @id @default(autoincrement())
+  payment_id BigInt @unique
+  receiptImage String?
+  user_id BigInt
+  status ReceiptStatus @default(PENDING)
+  adminNote String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  payment payment @relation(fields: [payment_id], references: [id])
+  user user @relation(fields: [user_id], references: [id])
+}
+
+enum CryptoStatus {
+  WAITING_PAYMENT
+  CONFIRMED
+  REJECTED
+  EXPIRED
+}
+
+model CryptoPayment{
+  id BigInt @id @default(autoincrement())
+  payment_id BigInt @unique
+  currency String
+  walletAddress String
+  expectedAmount String
+  receivedAmount String?
+  txHash String?
+  status CryptoStatus @default(WAITING_PAYMENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  payment payment @relation(fields: [payment_id], references: [id])
+}
+
+enum AccountStatus{
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model wallet_transaction {
+  id BigInt @id @default(autoincrement())
+  user_id BigInt
+  amount BigInt
+  type WalletTransactionType
+  description String?
+  createdAt DateTime @default(now())
+  user user @relation(fields: [user_id], references: [id])
+}
+
+enum WalletTransactionType {
+  DEPOSIT
+  PURCHASE
+  REFUND
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String   @db.LongText
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}
