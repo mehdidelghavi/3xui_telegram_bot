@@ -111,11 +111,11 @@ exports.priceFormatte = (price) => {
 }
 
 exports.generateURLForXui = (domain, port, path) => {
-    return `http://${domain}:${port}/${path}`;
+    return `https://${domain}:${port}/${path}`;
 }
 
 exports.generateSubLinkForXui = (domain, port, subPath, subId) => {
-    return `http://${domain}:${port}/${subPath}/${subId}`;
+    return `https://${domain}:${port}/${subPath}/${subId}`;
 }
 
 exports.generateTrackingCode = () => {
