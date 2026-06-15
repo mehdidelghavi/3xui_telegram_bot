@@ -206,6 +206,9 @@ exports.sellBot = (bot) => {
             }
         }
         if (getUserState.step == "شارژ ولت" && getUserState.level == 1) {
+            if (Number(ctx.message.text) > 10000000 || Number(ctx.message.text) < 10000) {
+                return await ctx.reply("مبلغ شما معتبر نمیباشد");
+            }
             const paymentMethods = await botController.getPaymentMethods();
             let inlineKeyboard = [];
             for (const paymentItems of paymentMethods) {
