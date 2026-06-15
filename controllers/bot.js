@@ -200,7 +200,7 @@ exports.getTodayOrders = async () => {
     endOfToday.setHours(23, 59, 59, 999);
     const getOrders = await prisma.order.count({
         where: {
-            created_at: {
+            createdAt: {
                 gte: startOfToday,
                 lte: endOfToday,
             }
