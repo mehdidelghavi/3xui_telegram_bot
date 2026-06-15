@@ -113,8 +113,8 @@ read -p "BOT_TOKEN: " BOT_TOKEN
 read -p "SELLBOT_TOKEN: " SELLBOT_TOKEN
 
 sed -i "s|Notebook_Channel_Id=.*|Notebook_Channel_Id=$Notebook_CHANNEL_ID|" .env
-sed -i "s|SELLBOT_TOKEN=.*|SELLBOT_TOKEN=$SELLBOT_TOKEN|" .env
 sed -i "s|BOT_TOKEN=.*|BOT_TOKEN=$BOT_TOKEN|" .env
+sed -i "s|SELLBOT_TOKEN=.*|SELLBOT_TOKEN=$SELLBOT_TOKEN|" .env
 sed -i "s|^DATABASE_URL=.*|DATABASE_URL=$DATABASE_URL|" .env
 sed -i "s|DATABASE_USER=.*|DATABASE_USER=$DB_USER|" .env
 sed -i "s|DATABASE_PASSWORD=.*|DATABASE_PASSWORD=$DB_PASS|" .env
