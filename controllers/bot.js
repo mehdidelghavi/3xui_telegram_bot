@@ -193,6 +193,22 @@ exports.getServicesCount = async () => {
     return getServicesCount;
 }
 
+exports.getTodayOrders = async () => {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+    const getOrders = await prisma.order.count({
+        where: {
+            created_at: {
+                gte: startOfToday,
+                lte: endOfToday,
+            }
+        }
+    });
+    return getOrders;
+}
+
 /**
  * دریافت لیست تمام سرورهای ثبت شده
  *
