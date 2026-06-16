@@ -232,9 +232,10 @@ exports.sellBot = (bot) => {
             const getPayment = await botController.getPaymentById(paymentId);
             const createdAt = new Date(getPayment.createdAt);
             const oneHourPassed = Date.now() - createdAt.getTime() > 60 * 60 * 1000;
-            // if (oneHourPassed) {
-            //     return ctx.reply("این سفارش شما منقضی شده است");
-            // }
+            if (oneHourPassed) {
+                const updatePaymentStatus = await botController.updatePaymentStatus(paymentId, "EXPIRED");
+                return ctx.reply("این سفارش شما منقضی شده است");
+            }
             const updatePaymentStatus = await botController.updatePaymentStatus(paymentId, "WAITING_CONFIRMATION");
             const photo = ctx.message.photo.at(-1);
             const photoLink = await ctx.telegram.getFileLink(photo.file_id);
