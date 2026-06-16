@@ -28,6 +28,10 @@ exports.bot = (bot) => {
             username: ctx.from.username || null
         };
 
+        if (getUser.role != "ADMIN") {
+            return ctx.reply("شما مجاز به استفاده از ربات نیستید");
+        }
+
         if (getUser) {
             ctx.user = getUser;
 
@@ -38,9 +42,6 @@ exports.bot = (bot) => {
                 await botController.updateUserInfo(data);
             }
 
-        } else {
-            const createUser = await botController.createUser(data);
-            ctx.user = createUser;
         }
 
         return next();
