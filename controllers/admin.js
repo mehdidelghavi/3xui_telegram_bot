@@ -262,6 +262,9 @@ exports.bot = (bot) => {
                 price: Number(ctx.message.text)
             }
             const servers = await botController.getServers();
+            if (servers == undefined || servers.length == 0) {
+                return ctx.reply(`❌ خطا: باید یک سرور اضافه کنید \n\n برای افزودن سرور از قسمت افزودن سرور اقدام کنید`);
+            }
             const inlineKeyboard = [];
             servers.forEach(serverItem => {
                 inlineKeyboard.push([
@@ -687,6 +690,9 @@ exports.bot = (bot) => {
         const updateUserState = await botController.updateUserState(ctx.user.id, "افزودن کلاینت", 4, userData);
         let url = functionHelpers.generateURLForXui(server.settings.domain, server.settings.port, server.settings.path);
         const getServices = await botController.getServicesByServerID(Number(serverId));
+        if (getServices == undefined || getServices.length == 0) {
+            return ctx.reply(`❌ خطا: برای این سرور سرویسی ثبت نشده است \n\n اول اقدام به افزودن سرویس از منوی افزودن سرویس کنید`);
+        }
         const inlineKeyboard = [];
         getServices.forEach(serviceItem => {
             inlineKeyboard.push([
@@ -710,6 +716,10 @@ exports.bot = (bot) => {
             services: services
         }
         const getService = await botController.getServiceById(Number(serviceId));
+        await ctx.answerCbQuery();
+        if (getService.inboundIDS == undefined || getService.inboundIDS.length == 0) {
+            return ctx.reply(`❌ خطا: باید به سرویسی که انتخاب کردید اینباند اضافه کنید از بخش نمایش سرویس ها روی سرویس مورد نظر کلیک کنید و از قسمت نمایش اینباند ها اینباند های مد نظر خود را ست کنید \n\n توجه کنید در وحله اول شما میبایست در پنل سرور خود اینباند های خود را ساخته باشید و بعد در قسمتی که بالا ذکر شد ست کنید`);
+        }
         userData.inboundIds ??= [];
         for (const serviceInbouds of getService.inboundIDS) {
             if (!userData.inboundIds.includes(serviceInbouds)) {
@@ -736,6 +746,9 @@ exports.bot = (bot) => {
         const getUserState = await botController.getUserState(ctx.user.id);
         const inboundsIDS = getUserState.data.inboundIds;
         const randomString = functionHelpers.generateRandomString();
+        if (inboundsIDS == undefined || inboundsIDS.length == 0) {
+            return ctx.reply(`❌ خطا: باید حداقل یک سرویس انتخاب کنید \n\n توجه کنید اگر در این قسمت سرویسی به شما نمایش داده نمیشود باید از قسمت افزودن سرویس سرویس جدید بسازید`);
+        }
         const userData = {
             ...getUserState.data,
             email: randomString,

@@ -63,11 +63,15 @@ exports.createClient = async (data) => {
         data.url = originUrl + `/panel/api/clients/get/${data.body.client.email}`;
         const clientSubId = await fetchHelper.getXui({ url: data.url, token: data.token });
         return {
+            success: true,
             links: clientLinks.obj,
             subId: clientSubId.obj.client.subId
         };
     } catch (e) {
-        console.log(e.message);
+        return {
+            success: false,
+            message: "❌ خطا: متاسفانه ارتباط با پنل سرور برقرار نشد"
+        };
     }
 }
 

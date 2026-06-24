@@ -9,6 +9,7 @@ const { ContextRunnerImpl } = require("express-validator/lib/chain");
 const { cardToCardReceipt } = require("../helpers/prisma");
 const jalaali = require("jalaali-js");
 const notebookChannel = process.env.Notebook_Channel_Id;
+const bcrypt = require("bcrypt");
 
 exports.sellBot = (bot) => {
 
@@ -513,6 +514,9 @@ exports.sellBot = (bot) => {
             }
         }
         const createUser = await xuiController.createClient(data);
+        if (!createUser.success) {
+            return ctx.reply(createUser.message);
+        }
         const buyConfingTransaction = await botController.usersConfigTransaction({
             user_id: user.id,
             plan_id: getPlan.id,
@@ -567,6 +571,9 @@ exports.sellBot = (bot) => {
         const paymentMethodId = ctx.match[1];
         const paymentMethod = await botController.getPaymentMethodById(paymentMethodId);
         const getPaymentMethodDetail = await botController.getPaymentMethodDetail(paymentMethodId);
+        if (getPaymentMethodDetail == null) {
+            return ctx.reply("❌ خطا: متاسفانه اطلاعاتی برای این روش پرداخت ثبت نشده است");
+        }
         const trackingCode = functionHelpers.generateTrackingCode();
         const getUserState = await botController.getUserState(ctx.user.id);
         let userData = {
