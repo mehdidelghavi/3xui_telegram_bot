@@ -738,7 +738,8 @@ exports.bot = (bot) => {
         const randomString = functionHelpers.generateRandomString();
         const userData = {
             ...getUserState.data,
-            email: randomString
+            email: randomString,
+            user_id: ctx.user.id
         }
         const updateUserState = await botController.updateUserState(ctx.user.id, "افزودن کلاینت", 5, userData);
         const trafficForXui = functionHelpers.GBtoByte(getUserState.data.traffic);

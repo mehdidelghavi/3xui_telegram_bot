@@ -471,8 +471,17 @@ exports.createClient = async (data) => {
             status: "CREATED",
             days: data.days,
             price: data.price,
-            server_id: data.server.id,
             traffic: data.traffic,
+            user: {
+                connect: {
+                    id: data.user_id
+                }
+            },
+            server: {
+                connect: {
+                    id: data.server.id
+                }
+            }
         }
     });
     const createRelation = await prisma.ServicesOnClients.createMany({
