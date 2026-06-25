@@ -92,9 +92,12 @@ exports.sellBot = (bot) => {
         const getUserClients = await botController.getUserClients(ctx.user.id);
         let inlineKeyboard = [];
         for (const clientItems of getUserClients) {
-            inlineKeyboard.push([
-                Markup.button.callback(`${clientItems.email} | ${clientItems.plan.traffic} GB ${clientItems.plan.days} Days | ${functionHelpers.priceFormatte(clientItems.price)} تومان`, `Client:Show:${clientItems.id}`)
-            ]);
+            if (clientItems.plan != null) {
+                inlineKeyboard.push([
+                    Markup.button.callback(`${clientItems.email} | ${clientItems.plan.traffic} GB ${clientItems.plan.days} Days | ${functionHelpers.priceFormatte(clientItems.price)} تومان`, `Client:Show:${clientItems.id}`)
+                ]);
+            }
+
         }
         ctx.reply("لیست کانفیگ های خریداری شده شما به شرح زیر میباشد", Markup.inlineKeyboard(inlineKeyboard));
     });
@@ -139,9 +142,11 @@ exports.sellBot = (bot) => {
         const getUserClients = await botController.getUserClients(ctx.user.id);
         let inlineKeyboard = [];
         for (const clientItems of getUserClients) {
-            inlineKeyboard.push([
-                Markup.button.callback(`${clientItems.email} | ${clientItems.plan.traffic} GB ${clientItems.plan.days} Days | ${functionHelpers.priceFormatte(clientItems.price)} تومان`, `Config:Renew:Account:${clientItems.id}`)
-            ]);
+            if (clientItems.plan != null) {
+                inlineKeyboard.push([
+                    Markup.button.callback(`${clientItems.email} | ${clientItems.plan.traffic} GB ${clientItems.plan.days} Days | ${functionHelpers.priceFormatte(clientItems.price)} تومان`, `Config:Renew:Account:${clientItems.id}`)
+                ]);
+            }
         }
         ctx.reply("یکی از کانفیگ های خریداری شده را انتخاب کنید اگر کانفیک مد نظر شما در این لیست نیست لطفا نام کاربری کانفیگ را ارسال کنید", Markup.inlineKeyboard(inlineKeyboard));
     });
@@ -286,7 +291,7 @@ exports.sellBot = (bot) => {
         let url = functionHelpers.generateURLForXui(getServer.settings.domain, getServer.settings.port, getServer.settings.path) + `/panel/api/clients/traffic/${getClientById.email}`;
         const getClient = await xuiController.getClient({ url: url, token: getServer.settings.token });
         let clientInfo = null;
-        if (getClient.success) {
+        if (getClient.obj != null) {
             clientInfo = getClient.obj;
             const totalTraffic = functionHelpers.BytetoGB(clientInfo.total);
             const remainingTraffic = functionHelpers.BytetoGB((clientInfo.total - clientInfo.down) - clientInfo.up);
