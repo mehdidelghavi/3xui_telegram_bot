@@ -554,8 +554,15 @@ exports.sellBot = (bot) => {
             Text += `⌛️ زمان: ${getPlan.days} روزه \n\n`;
             Text += `🌐 سرور: ${getServer.settings.name} \n\n`;
             const messageSent = await functionHelpers.sendMessageWithQr(ctx, Text, subLink);
+            let noteBookText = `خرید کاربران \n\n حجم: ${trafficForUi} \n\n  زمان: ${getPlan.days} روزه \n\n سرور: ${getServer.settings.name} \n\n نام کاربری: <code>${email}</code> \n\n مبلغ قابل پرداخت: ${functionHelpers.priceFormatte(getPlan.price)} تومان`;
+            const notebookSent = await ctx.telegram.sendMessage(
+                notebookChannel,
+                noteBookText,
+                {
+                    parse_mode: "HTML"
+                }
+            );
         } else {
-            console.log(buyConfingTransaction.message);
             let url = functionHelpers.generateURLForXui(getServer.settings.domain, getServer.settings.port, getServer.settings.path);
             const data = {
                 url: url + `/panel/api/clients/del/${email}`,
